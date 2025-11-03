@@ -1,2 +1,2 @@
 # XPR_SimplePay
-XPR SimplePay: Merchant solution for accepting dynamic, user-set XPR payments directly on any website using the WebAuth wallet SDK.
+XPR SimplePay: Merchant Decentralized Application (DApp) for accepting dynamic, user-set XPR Network payments directly on any website using the WebAuth wallet Sofware Development Kit (SDK).
