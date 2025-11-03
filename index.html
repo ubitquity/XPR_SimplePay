@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>XPR SimplePay – UBITQUITY</title>
 
-  <!-- Proton Web SDK (latest version) -->
-  <script src="https://unpkg.com/@proton/web-sdk@latest/dist/index.js"></script>
+  <!-- Proton Web SDK (UMD version for full mobile compatibility) -->
+  <script src="https://unpkg.com/@proton/web-sdk/dist/web-sdk.umd.js"></script>
+  <script>
+    const { ProtonWebSDK } = window;
+  </script>
 
   <style>
     body {
@@ -86,7 +89,7 @@
   <div id="status">Ready.</div>
 
   <script>
-    // XPR Mainnet Configuration (Verified 2025)
+    // ✅ XPR Mainnet Configuration (Verified 2025)
     const CHAIN_ID = "384da888112027f0321850a169f737c33e53b388aad48b5adace4bab97f437e0";
     const ENDPOINTS = [
       "https://proton.greymass.com",
@@ -102,9 +105,9 @@
     const paymentForm = document.getElementById('paymentForm');
     const userInfo = document.getElementById('userInfo');
 
-    // Check if SDK loaded
+    // 🧭 Kiểm tra SDK
     if (!window.ProtonWebSDK) {
-      statusEl.textContent = "SDK failed to load. Check internet or browser extensions.";
+      statusEl.textContent = "SDK failed to load. Check internet or browser.";
       console.error("ProtonWebSDK not loaded");
     }
 
@@ -117,7 +120,7 @@
           linkOptions: {
             chainId: CHAIN_ID,
             endpoints: ENDPOINTS,
-            restoreSession: false
+            restoreSession: true   // ✅ Tự khôi phục ví khi reload
           },
           transportOptions: {
             requestAccount: APP_NAME
@@ -198,6 +201,13 @@
 
     connectButton.addEventListener('click', connectWallet);
     paymentForm.addEventListener('submit', sendPayment);
+
+    // 🔍 Thêm kiểm tra SDK khi tải trang
+    window.addEventListener("load", () => {
+      if (!window.ProtonWebSDK) {
+        statusEl.textContent = "SDK not ready. Try reloading.";
+      }
+    });
   </script>
 </body>
 </html>
