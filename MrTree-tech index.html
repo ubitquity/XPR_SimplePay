@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UBITQUITY Merchant Solutions – WebAuth XPR Payment</title>
-  
+
   <!-- Proton Web SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@proton/web-sdk@latest/dist/proton-web-sdk.min.js"></script>
-  
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -85,14 +85,19 @@
       try {
         statusEl.textContent = "Connecting to wallet...";
 
-        const { link: walletLink, session: walletSession } = await ProtonWebSDK({
-          linkOptions: { chainId: CHAIN_ID, endpoints: ENDPOINTS },
-          transportOptions: { requestAccount: APP_NAME },
-          selectorOptions: { appName: APP_NAME }
+        // Load SDK classes
+        const { Link, BrowserTransport } = ProtonWebSDK.default;
+
+        // Create new Link
+        link = new Link({
+          chainId: CHAIN_ID,
+          endpoints: ENDPOINTS,
+          transport: new BrowserTransport(),
+          walletType: 'webauth'
         });
 
-        link = walletLink;
-        session = walletSession;
+        // Request login
+        session = await link.login(APP_NAME);
 
         const actor = session.auth.actor;
         userInfo.textContent = `✅ Wallet Connected: ${actor}`;
