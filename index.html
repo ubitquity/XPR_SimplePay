@@ -3,64 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UBITQUITY Merchant Solutions – WebAuth XPR Payment</title>
+  <title>XPR SimplePay Test – UBITQUITY</title>
 
-  <!-- Proton Web SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@proton/web-sdk@latest/dist/proton-web-sdk.min.js"></script>
+  <!-- Proton Web SDK (dùng unpkg để ổn định hơn) -->
+  <script src="https://unpkg.com/@proton/web-sdk@4.0.0/dist/index.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f9fc;
-      color: #333;
-      margin: 0;
-      padding: 2rem;
-    }
-    h1 {
-      color: #2b70f9;
-    }
-    #status {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    #userInfo {
-      margin-top: 1rem;
-      background: #eaf3ff;
-      padding: 1rem;
-      border-radius: 6px;
-    }
-    form {
-      margin-top: 1rem;
-      display: none;
-    }
-    input, button {
-      padding: 0.5rem;
-      margin: 0.25rem 0;
-      width: 100%;
-      font-size: 1rem;
-    }
-    button {
-      background: #2b70f9;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    button:hover {
-      background: #1f55c2;
-    }
+    body { font-family: Arial, sans-serif; background: #f7f9fc; color: #333; margin: 0; padding: 2rem; }
+    h1 { color: #2b70f9; }
+    #status { margin-top: 1rem; font-weight: bold; min-height: 20px; }
+    #userInfo { margin-top: 1rem; background: #eaf3ff; padding: 1rem; border-radius: 6px; display: none; }
+    form { margin-top: 1rem; display: none; }
+    input, button { padding: 0.5rem; margin: 0.25rem 0; width: 100%; font-size: 1rem; box-sizing: border-box; }
+    button { background: #2b70f9; color: white; border: none; cursor: pointer; border-radius: 4px; }
+    button:hover { background: #1f55c2; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
   </style>
 </head>
 <body>
-  <h1>UBITQUITY Merchant Solutions – XPR Wallet Payment</h1>
+  <h1>XPR SimplePay by UBITQUITY Merchant Solutions</h1>
+  <p>Connect your wallet to begin.</p>
 
   <button id="connectButton">🔗 Connect Wallet</button>
 
-  <div id="userInfo" style="display:none;"></div>
+  <div id="userInfo"></div>
 
   <form id="paymentForm">
-    <input id="recipient" placeholder="Recipient account (e.g. ubitquityxpr)" />
-    <input id="amount" type="number" step="0.0001" placeholder="Amount (e.g. 1.5)" />
+    <input id="recipient" placeholder="Recipient account (e.g. yourmerchantxpr)" required />
+    <input id="amount" type="number" step="0.0001" min="0.0001" placeholder="Amount in XPR (e.g. 1.5)" required />
     <input id="memo" placeholder="Memo (optional)" />
     <button type="submit">🚀 Send Payment</button>
   </form>
@@ -68,37 +38,39 @@
   <div id="status"></div>
 
   <script>
-    // === Proton Mainnet Configuration ===
+    // === XPR Mainnet Config (đã xác thực) ===
     const CHAIN_ID = "384da888112027f0321850a169f737c33e53b388aad48b5adace4bab97f437e0";
     const ENDPOINTS = ["https://proton.greymass.com"];
-    const APP_NAME = "UbitquityPay";  // Rút gọn để hiển thị tốt hơn
+    const APP_NAME = "XPRSimplePay";
 
     let link, session;
-
     const statusEl = document.getElementById('status');
     const connectButton = document.getElementById('connectButton');
     const paymentForm = document.getElementById('paymentForm');
     const userInfo = document.getElementById('userInfo');
 
+    // Kiểm tra SDK load
+    if (typeof ProtonWebSDK === 'undefined') {
+      statusEl.textContent = '❌ Proton SDK failed to load. Check network or CDN.';
+      console.error('SDK not loaded');
+    }
+
     // --- Connect Wallet ---
     async function connectWallet() {
-      try {
-        statusEl.textContent = "Connecting to wallet...";
+      if (!ProtonWebSDK) return statusEl.textContent = '❌ SDK not ready. Reload page.';
+      
+      connectButton.disabled = true;
+      statusEl.textContent = "Connecting to wallet...";
 
-        // Sử dụng ProtonWebSDK trực tiếp (không manual Link/Transport)
+      try {
         const { link: walletLink, session: walletSession } = await ProtonWebSDK({
           linkOptions: {
             chainId: CHAIN_ID,
             endpoints: ENDPOINTS,
-            restoreSession: true  // Tự động restore session cũ nếu có
+            restoreSession: true
           },
-          transportOptions: {
-            requestAccount: APP_NAME
-          },
-          selectorOptions: {
-            appName: APP_NAME
-            // Thêm logo và style nếu cần: appLogo: 'url_to_logo', customStyleOptions: { ... }
-          }
+          transportOptions: { requestAccount: APP_NAME },
+          selectorOptions: { appName: APP_NAME }
         });
 
         link = walletLink;
@@ -110,19 +82,18 @@
         connectButton.style.display = 'none';
         paymentForm.style.display = 'block';
         statusEl.textContent = 'Ready to send a transaction.';
+        console.log('Connected:', actor);
       } catch (e) {
-        statusEl.textContent = `❌ Error connecting wallet: ${e.message}`;
+        statusEl.textContent = `❌ Connect failed: ${e.message || e}`;
         console.error("Connect Error:", e);
+        connectButton.disabled = false;
       }
     }
 
     // --- Send Payment ---
     async function sendPayment(event) {
       event.preventDefault();
-      if (!session) {
-        statusEl.textContent = 'Please connect your wallet first.';
-        return;
-      }
+      if (!session) return statusEl.textContent = '⚠️ Connect wallet first.';
 
       const recipient = document.getElementById('recipient').value.trim();
       const amountStr = document.getElementById('amount').value.trim();
@@ -130,34 +101,30 @@
 
       const amount = parseFloat(amountStr);
       if (!recipient || isNaN(amount) || amount <= 0) {
-        statusEl.textContent = '⚠️ Please fill in a valid recipient and amount.';
-        return;
+        return statusEl.textContent = '⚠️ Invalid recipient or amount.';
       }
 
       const quantity = `${amount.toFixed(4)} XPR`;
 
+      statusEl.textContent = '🚀 Sending... Confirm in wallet.';
       try {
-        statusEl.textContent = '🚀 Sending transaction... Please confirm in your wallet.';
         const { actor, permission } = session.auth;
-
         const actions = [{
           account: 'eosio.token',
           name: 'transfer',
           authorization: [{ actor, permission }],
-          data: { from: actor, to: recipient, quantity, memo }
+          data: { from: actor, to: recipient, quantity, memo: memo || '' }
         }];
 
         const result = await session.transact({ actions }, { broadcast: true });
-
         statusEl.innerHTML = `
           <strong>✅ Success!</strong><br>
-          Transaction ID: ${result.processed.id}<br>
-          <a href="https://explorer.xprnetwork.org/transaction/${result.processed.id}" target="_blank">
-            View on XPR Explorer
-          </a>
+          Tx ID: ${result.processed.id}<br>
+          <a href="https://explorer.xprnetwork.org/transaction/${result.processed.id}" target="_blank">View on Explorer</a>
         `;
+        console.log('Tx success:', result);
       } catch (e) {
-        statusEl.textContent = `❌ Error sending transaction: ${e.message}`;
+        statusEl.textContent = `❌ Send failed: ${e.message || e}`;
         console.error("Send Error:", e);
       }
     }
