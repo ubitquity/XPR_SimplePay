@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPR SimplePay DApp (v1.1) - Integration Examples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .example-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .example-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .example-card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .status.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .product-demo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .product-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .wallet-status {
+            background: #f7f9fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .wallet-status.connected {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .account-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7f9fc;
+            border-radius: 8px;
+        }
+
+        .account-info div {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .account-info strong {
+            color: #333;
+        }
+
+        code {
+            background: #f7f9fc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #667eea;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 XPR SimplePay DApp (v1.1)</h1>
+        <p class="subtitle">Integration examples for your website</p>
+
+        <div class="examples-grid">
+            <!-- Example 1: Simple Button -->
+            <div class="example-card">
+                <h2>1. Simple Payment Button</h2>
+                <p>A basic payment button that handles everything automatically.</p>
+                
+                <div class="product-demo">
+                    <div class="product-image">🎨</div>
+                    <div class="product-info">
+                        <h3>Digital Art Pack</h3>
+                        <div class="product-price">5 XPR</div>
+                    </div>
+                </div>
+                
+                <div id="simple-button"></div>
+                <div id="simple-status" class="status"></div>
+            </div>
+
+            <!-- Example 2: Payment Modal -->
+            <div class="example-card">
+                <h2>2. Payment Modal</h2>
+                <p>Opens a confirmation modal before processing payment.</p>
+                
+                <div class="product-demo">
+                    <div class="product-image">📚</div>
+                    <div class="product-info">
+                        <h3>E-Book Bundle</h3>
+                        <div class="product-price">15 XPR</div>
+                    </div>
+                </div>
+                
+                <button onclick="showModalPayment()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
+                    Buy Now
+                </button>
+                <div id="modal-status" class="status"></div>
+            </div>
+
+            <!-- Example 3: Manual Flow -->
+            <div class="example-card">
+                <h2>3. Manual Payment Flow</h2>
+                <p>Full control over the payment process with custom UI.</p>
+                
+                <div id="manual-wallet-status" class="wallet-status">
+                    Not connected
+                </div>
+                
+                <button onclick="manualConnect()" id="manual-connect-btn" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 10px;">
+                    Connect Wallet
+                </button>
+                
+                <div id="manual-payment-form" style="display: none;">
+                    <input type="text" id="manual-recipient" placeholder="Recipient account" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                    <input type="number" id="manual-amount" placeholder="Amount (XPR)" step="0.0001" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                    <button onclick="manualSendPayment()" style="width: 100%; padding: 12px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Send Payment
+                    </button>
+                </div>
+                
+                <div id="manual-account-info" class="account-info" style="display: none;"></div>
+                <div id="manual-status" class="status"></div>
+            </div>
+
+            <!-- Example 4: Donation Widget -->
+            <div class="example-card">
+                <h2>4. Donation Widget</h2>
+                <p>Accept donations with preset amounts or custom values.</p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500;">Choose amount:</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
+                        <button onclick="setDonationAmount(1)" style="padding: 10px; border: 2px solid #e5e7eb; background: white; border-radius: 8px; cursor: pointer;">1 XPR</button>
+                        <button onclick="setDonationAmount(5)" style="padding: 10px; border: 2px solid #e5e7eb; background: white; border-radius: 8px; cursor: pointer;">5 XPR</button>
+                        <button onclick="setDonationAmount(10)" style="padding: 10px; border: 2px solid #e5e7eb; background: white; border-radius: 8px; cursor: pointer;">10 XPR</button>
+                    </div>
+                    <input type="number" id="donation-amount" placeholder="Or enter custom amount" step="0.0001" min="0.0001" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px;">
+                </div>
+                
+                <button onclick="sendDonation()" style="width: 100%; padding: 12px; background: #f59e0b; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
+                    💝 Send Donation
+                </button>
+                <div id="donation-status" class="status"></div>
+            </div>
+
+            <!-- Example 5: Subscription -->
+            <div class="example-card">
+                <h2>5. Subscription Payment</h2>
+                <p>One-click payment for recurring services.</p>
+                
+                <div style="background: #f7f9fc; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                    <h3 style="color: #333; margin-bottom: 10px;">Premium Membership</h3>
+                    <ul style="list-style: none; padding: 0; margin-bottom: 15px;">
+                        <li style="padding: 5px 0; color: #666;">✅ Unlimited downloads</li>
+                        <li style="padding: 5px 0; color: #666;">✅ Priority support</li>
+                        <li style="padding: 5px 0; color: #666;">✅ Exclusive content</li>
+                    </ul>
+                    <div style="font-size: 24px; color: #667eea; font-weight: 700;">25 XPR/month</div>
+                </div>
+                
+                <div id="subscription-button"></div>
+                <div id="subscription-status" class="status"></div>
+            </div>
+
+            <!-- Example 6: Custom Amount -->
+            <div class="example-card">
+                <h2>6. Pay What You Want</h2>
+                <p>Let customers choose their own price.</p>
+                
+                <div class="product-demo">
+                    <div class="product-image">🎵</div>
+                    <div class="product-info">
+                        <h3>Music Album</h3>
+                        <div style="color: #666; font-size: 14px;">Name your price</div>
+                    </div>
+                </div>
+                
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500;">Your price (minimum 1 XPR):</label>
+                <input type="number" id="pwyw-amount" placeholder="Enter amount" step="0.0001" min="1" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px;">
+                
+                <button onclick="sendPWYW()" style="width: 100%; padding: 12px; background: #8b5cf6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
+                    Purchase Album
+                </button>
+                <div id="pwyw-status" class="status"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>These examples demonstrate the <code>xpr-payment-integration.js</code> library</p>
+            <p style="margin-top: 10px;">
+                <a href="README.md" target="_blank">View Documentation</a> | 
+                <a href="https://github.com/yourusername/xpr-payment" target="_blank">GitHub</a> | 
+                <a href="https://xprnetwork.org" target="_blank">XPR Network</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="xpr-payment-integration.js"></script>
+    <script>
+        let xprPayment;
+
+        // Initialize on page load
+        XPRPayment.init({
+            onSuccess: (result) => {
+                console.log('Payment successful!', result);
+            },
+            onError: (error) => {
+                console.error('Payment error:', error);
+            }
+        }).then(payment => {
+            xprPayment = payment;
+            setupExamples();
+        });
+
+        function setupExamples() {
+            // Example 1: Simple button
+            const simpleButton = xprPayment.createPaymentButton({
+                text: 'Buy for 5 XPR',
+                recipient: 'testaccount1',
+                amount: 5,
+                memo: 'Digital Art Pack Purchase'
+            });
+            simpleButton.onclick = async function() {
+                this.disabled = true;
+                this.textContent = 'Processing...';
+                try {
+                    if (!xprPayment.isConnected()) {
+                        await xprPayment.connect();
+                    }
+                    const result = await xprPayment.sendPayment('testaccount1', 5, 'Digital Art Pack Purchase');
+                    showStatus('simple-status', result.success ? 'Payment successful! 🎉' : 'Payment failed', result.success ? 'success' : 'error');
+                } finally {
+                    this.disabled = false;
+                    this.textContent = 'Buy for 5 XPR';
+                }
+            };
+            document.getElementById('simple-button').appendChild(simpleButton);
+
+            // Example 5: Subscription button
+            const subButton = xprPayment.createPaymentButton({
+                text: 'Subscribe Now - 25 XPR',
+                recipient: 'subscription1',
+                amount: 25,
+                memo: 'Premium Membership - Month 1'
+            });
+            subButton.onclick = async function() {
+                this.disabled = true;
+                this.textContent = 'Processing...';
+                try {
+                    if (!xprPayment.isConnected()) {
+                        await xprPayment.connect();
+                    }
+                    const result = await xprPayment.sendPayment('subscription1', 25, 'Premium Membership - Month 1');
+                    showStatus('subscription-status', result.success ? 'Subscription activated! 🎉' : 'Subscription failed', result.success ? 'success' : 'error');
+                } finally {
+                    this.disabled = false;
+                    this.textContent = 'Subscribe Now - 25 XPR';
+                }
+            };
+            document.getElementById('subscription-button').appendChild(subButton);
+        }
+
+        // Example 2: Modal payment
+        function showModalPayment() {
+            xprPayment.showPaymentModal({
+                recipient: 'ebookstore1',
+                amount: 15,
+                memo: 'E-Book Bundle Purchase'
+            });
+        }
+
+        // Example 3: Manual flow
+        async function manualConnect() {
+            const btn = document.getElementById('manual-connect-btn');
+            btn.disabled = true;
+            btn.textContent = 'Connecting...';
+            
+            try {
+                const result = await xprPayment.connect();
+                if (result.success) {
+                    document.getElementById('manual-wallet-status').textContent = `Connected: ${result.account}`;
+                    document.getElementById('manual-wallet-status').classList.add('connected');
+                    btn.style.display = 'none';
+                    document.getElementById('manual-payment-form').style.display = 'block';
+                    
+                    const balance = await xprPayment.getBalance();
+                    document.getElementById('manual-account-info').style.display = 'block';
+                    document.getElementById('manual-account-info').innerHTML = `
+                        <div><strong>Account:</strong> ${result.account}</div>
+                        <div><strong>Balance:</strong> ${balance}</div>
+                    `;
+                }
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Connect Wallet';
+            }
+        }
+
+        async function manualSendPayment() {
+            const recipient = document.getElementById('manual-recipient').value;
+            const amount = parseFloat(document.getElementById('manual-amount').value);
+            
+            if (!recipient || !amount) {
+                showStatus('manual-status', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            const result = await xprPayment.sendPayment(recipient, amount, 'Manual payment');
+            showStatus('manual-status', result.success ? `Sent ${amount} XPR to ${recipient}` : result.error, result.success ? 'success' : 'error');
+            
+            if (result.success) {
+                document.getElementById('manual-recipient').value = '';
+                document.getElementById('manual-amount').value = '';
+                const balance = await xprPayment.getBalance();
+                document.getElementById('manual-account-info').innerHTML = `
+                    <div><strong>Account:</strong> ${xprPayment.getAccount()}</div>
+                    <div><strong>Balance:</strong> ${balance}</div>
+                `;
+            }
+        }
+
+        // Example 4: Donation
+        function setDonationAmount(amount) {
+            document.getElementById('donation-amount').value = amount;
+        }
+
+        async function sendDonation() {
+            const amount = parseFloat(document.getElementById('donation-amount').value);
+            if (!amount || amount <= 0) {
+                showStatus('donation-status', 'Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (!xprPayment.isConnected()) {
+                await xprPayment.connect();
+            }
+            
+            const result = await xprPayment.sendPayment('donations', amount, 'Thank you for your support! ❤️');
+            showStatus('donation-status', result.success ? `Thank you for donating ${amount} XPR! 🙏` : result.error, result.success ? 'success' : 'error');
+            
+            if (result.success) {
+                document.getElementById('donation-amount').value = '';
+            }
+        }
+
+        // Example 6: Pay what you want
+        async function sendPWYW() {
+            const amount = parseFloat(document.getElementById('pwyw-amount').value);
+            if (!amount || amount < 1) {
+                showStatus('pwyw-status', 'Minimum amount is 1 XPR', 'error');
+                return;
+            }
+            
+            if (!xprPayment.isConnected()) {
+                await xprPayment.connect();
+            }
+            
+            const result = await xprPayment.sendPayment('musicstore', amount, 'Music Album Purchase');
+            showStatus('pwyw-status', result.success ? `Album purchased for ${amount} XPR! Enjoy! 🎵` : result.error, result.success ? 'success' : 'error');
+            
+            if (result.success) {
+                document.getElementById('pwyw-amount').value = '';
+            }
+        }
+
+        // Helper function to show status messages
+        function showStatus(elementId, message, type) {
+            const statusEl = document.getElementById(elementId);
+            statusEl.textContent = message;
+            statusEl.className = `status ${type} show`;
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
