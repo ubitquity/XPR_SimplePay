@@ -425,7 +425,7 @@ async function initialize() {
             },
             selectorOptions: {
                 appName: 'XPR SimplePay',
-                appLogo: '',
+                appLogo: 'https://ubitquitypay.com/DApps/XPR_SimplePay/images/XPR_SimplePay_logo.jpg',
                 customStyleOptions: {
                     modalBackgroundColor: '#F4F7FA',
                     logoBackgroundColor: 'white',
