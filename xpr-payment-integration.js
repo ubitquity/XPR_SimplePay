@@ -46,7 +46,7 @@
                 script.onerror = () => {
                     // If local file fails, try CDN
                     const cdnScript = document.createElement('script');
-                    cdnScript.src = 'https://unpkg.com/@proton/web-sdk@latest';
+                    cdnScript.src = 'https://unpkg.com/@proton/web-sdk@latest/dist/browser.js';
                     cdnScript.onload = resolve;
                     cdnScript.onerror = () => reject(new Error('Failed to load Proton SDK from both local and CDN'));
                     document.head.appendChild(cdnScript);
